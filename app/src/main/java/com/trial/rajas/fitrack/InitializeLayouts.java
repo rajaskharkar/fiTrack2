@@ -1,6 +1,7 @@
 package com.trial.rajas.fitrack;
 
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,4 +18,9 @@ public class InitializeLayouts {
     public static TextView initializeTextView(View viewById) {
         return (TextView) viewById;
     }
+
+    public static EditText initializeEditText(View viewById){
+        return (EditText) viewById;
+    }
+
 }

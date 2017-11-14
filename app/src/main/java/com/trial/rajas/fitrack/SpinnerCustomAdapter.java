@@ -37,11 +37,19 @@ public class SpinnerCustomAdapter extends ArrayAdapter<Activity> {
         LinearLayout viewLL= (LinearLayout) view.findViewById(R.id.spinnerLayout);
         TextView taskTextView = (TextView) view.findViewById(R.id.taskSpinnerTextView);
         TextView scoreTextView = (TextView) view.findViewById(R.id.scoreSpinnerTextView);
+        TextView signTextView = (TextView) view.findViewById(R.id.signSpinnerTextView);
         Activity activity = activityArrayList.get(position);
         taskTextView.setText(activity.getTask());
+        if(activity.getSign().equals("+")){
+            signTextView.setText("+");
+        }
+        else{
+            signTextView.setText("-");
+        }
         scoreTextView.setText(activity.getScore()+"");
         taskTextView.setTextSize(18);
         scoreTextView.setTextSize(18);
+        signTextView.setTextSize(18);
         return view;
     }
 

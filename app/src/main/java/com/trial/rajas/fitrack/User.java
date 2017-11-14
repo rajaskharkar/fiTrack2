@@ -1,6 +1,12 @@
 package com.trial.rajas.fitrack;
 
+import android.content.Intent;
+import android.widget.Toast;
+
 import com.backendless.Backendless;
+import com.backendless.BackendlessUser;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
 
 import java.util.ArrayList;
 
@@ -9,6 +15,8 @@ import java.util.ArrayList;
  */
 
 public class User {
+
+
 
     public static String getUsername() {
         return username;

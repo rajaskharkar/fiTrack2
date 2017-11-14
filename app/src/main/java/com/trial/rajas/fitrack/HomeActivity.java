@@ -1,27 +1,29 @@
 package com.trial.rajas.fitrack;
 
 import android.content.Context;
-        import android.content.Intent;
-        import android.graphics.Color;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.support.v4.widget.DrawerLayout;
-        import android.support.v4.widget.ListViewAutoScrollHelper;
-        import android.support.v7.app.ActionBar;
-        import android.support.v7.app.AlertDialog;
-        import android.support.v7.app.AppCompatActivity;
-        import android.os.Bundle;
-        import android.view.View;
-        import android.widget.AdapterView;
-        import android.widget.ArrayAdapter;
-        import android.widget.LinearLayout;
-        import android.widget.ListView;
-        import android.widget.TextView;
+import android.support.v4.widget.ListViewAutoScrollHelper;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.backendless.Backendless;
 import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
+import com.backendless.persistence.local.UserIdStorageFactory;
+import com.backendless.persistence.local.UserTokenStorageFactory;
 
 import java.util.ArrayList;
         import java.util.List;
@@ -62,8 +64,10 @@ public class HomeActivity extends AppCompatActivity  {
         setBackgroundColors(top,middle,bottom);
         setTextData(titleText, addActivityText);
 
-        Integer score=0;
-        setScoreTextSpecs(scoreText, score);
+        Backendless.initApp(this, BackendlessCredentials.APP_ID, BackendlessCredentials.SECRET_KEY);
+        BackendlessUser currentUser= Backendless.UserService.CurrentUser();
+        String scoreGet= currentUser.getProperty("score").toString();
+        setScoreTextSpecs(scoreText, scoreGet);
 
         bottom.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -86,8 +90,9 @@ public class HomeActivity extends AppCompatActivity  {
         addToDrawerItems(drawerItems, "Log out");
     }
 
-    private void setScoreTextSpecs(TextView scoreText, Integer score) {
-        scoreText.setText(score.toString());
+    private void setScoreTextSpecs(TextView scoreText, String score) {
+        //scoreText.setText(score.toString());
+        scoreText.setText(score);
         scoreText.setTextColor(Color.BLACK);
     }
 
@@ -176,6 +181,7 @@ public class HomeActivity extends AppCompatActivity  {
     public void startAddActivity(){
         Intent addActivityIntent= new Intent(HomeActivity.this, AddActivity.class);
         startActivity(addActivityIntent);
+        finish();
     }
 }
 

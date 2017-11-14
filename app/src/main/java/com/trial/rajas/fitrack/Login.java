@@ -25,6 +25,7 @@ public class Login extends AppCompatActivity {
     AsyncCallback<BackendlessUser> loginCallBackActual= new AsyncCallback<BackendlessUser>() {
         @Override
         public void handleResponse(BackendlessUser response) {
+            Backendless.UserService.setCurrentUser(response);
             Toast.makeText(getApplicationContext(), "Successfully logged in!", Toast.LENGTH_SHORT).show();
             Intent goHome= new Intent(Login.this, HomeActivity.class);
             startActivity(goHome);
@@ -67,8 +68,6 @@ public class Login extends AppCompatActivity {
         Backendless.initApp(this, BackendlessCredentials.APP_ID, BackendlessCredentials.SECRET_KEY);
         String username= userNameET.getEditableText().toString();
         String password= passwordET.getEditableText().toString();
-
-
 
         loginFinalLL.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

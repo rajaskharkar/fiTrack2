@@ -3,13 +3,13 @@ package com.trial.rajas.fitrack;
 public class Activity {
 
     String task;
-    Integer score;
     String sign;
+    Integer score;
 
-    public Activity(String task, Integer score, String sign){
+    public Activity(String task, String sign, Integer score){
         this.task=task;
-        this.score=score;
         this.sign=sign;
+        this.score=score;
     }
 
     public String getTask() {
@@ -22,5 +22,11 @@ public class Activity {
 
     public String getSign() {
         return sign;
+    }
+
+    public String addToJSON(String task, String sign, Integer score, String present){
+        String activityJson= new String();
+
+        return activityJson;
     }
 }

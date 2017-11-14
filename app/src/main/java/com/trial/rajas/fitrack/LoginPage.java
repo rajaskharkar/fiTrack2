@@ -4,14 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.backendless.Backendless;
+import com.backendless.BackendlessUser;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.local.UserTokenStorageFactory;
 
 /**
@@ -20,19 +25,40 @@ import com.backendless.persistence.local.UserTokenStorageFactory;
 
 public class LoginPage extends AppCompatActivity {
 
-    public static String userToken= new String();
-
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_page_layout);
         Context context=this;
-
         Backendless.initApp(this, BackendlessCredentials.APP_ID, BackendlessCredentials.SECRET_KEY);
-        String userToken= UserTokenStorageFactory.instance().getStorage().get();
-        Intent checkLogin= new Intent(LoginPage.this, HomeActivity.class);
 
-        if( userToken != null && !userToken.equals( "" ) )
-            startActivity(checkLogin);
+        AsyncCallback<Boolean> loginValidityCallback = new AsyncCallback<Boolean>(){
+            @Override
+            public void handleResponse( Boolean response ){
+                if(response==true){
+                    String loggedIn=Backendless.UserService.loggedInUser();
+                    Backendless.Data.of( BackendlessUser.class ).findById(loggedIn, new AsyncCallback<BackendlessUser>() {
+                        @Override
+                        public void handleResponse(BackendlessUser currentUser) {
+                            Backendless.UserService.setCurrentUser(currentUser);
+                            Intent checkLogin= new Intent(LoginPage.this, HomeActivity.class);
+                            startActivity(checkLogin);
+                        }
+
+                        @Override
+                        public void handleFault(BackendlessFault fault) {
+                            Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+                else
+                    Toast.makeText(getApplicationContext(), "Not logged in yet.", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void handleFault( BackendlessFault fault ){
+                Toast.makeText(getApplicationContext(), "NO.", Toast.LENGTH_LONG).show();
+            }
+        };
+        Backendless.UserService.isValidLogin(loginValidityCallback);
 
         LinearLayout loginTitleLL=(LinearLayout) findViewById(R.id.loginTitleLinearLayout);
         LinearLayout loginButtonLL=(LinearLayout) findViewById(R.id.loginButtonLinearLayout);

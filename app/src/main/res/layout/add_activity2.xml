@@ -51,17 +51,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical"
-        android:layout_weight="1.5">
+        android:orientation="horizontal"
+        android:layout_weight="2.5"
+        android:weightSum="10">
 
         <Spinner
-            android:id="@+id/spin"
-            android:layout_width="match_parent"
+            android:id="@+id/activitySpin"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:layout_weight="8">
         </Spinner>
-
     </LinearLayout>
 
     <LinearLayout
@@ -77,14 +78,25 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:hint="Enter Activity"
-            android:layout_weight="7"/>
+            android:layout_weight="6"
+            android:gravity="center"/>
+
+        <Spinner
+            android:id="@+id/signSpin"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+        </Spinner>
 
         <EditText
             android:id="@+id/scoreEditText"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:hint="XX"
-            android:layout_weight="3"/>
+            android:layout_weight="3"
+            android:gravity="center"/>
     </LinearLayout>
 
     <LinearLayout
@@ -109,44 +121,53 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/saveActivityLinearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/saveActivityTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:clickable="false"
-            android:duplicateParentState="true"
-            android:gravity="center"
-            android:text="TextView"
-            android:textColor="#FFFFFF"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/addLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:weightSum="10">
 
-        <TextView
-            android:id="@+id/addActivityTextView"
+        <LinearLayout
+            android:id="@+id/addLinearLayout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:clickable="false"
-            android:duplicateParentState="true"
-            android:gravity="center"
-            android:text="TextView"
-            android:textColor="#FFFFFF" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="8"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/addActivityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:clickable="false"
+                android:duplicateParentState="true"
+                android:gravity="center"
+                android:text="TextView"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/saveActivityLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="2"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/saveActivityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:clickable="false"
+                android:duplicateParentState="true"
+                android:gravity="center"
+                android:text="TextView"
+                android:textColor="#FFFFFF"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
