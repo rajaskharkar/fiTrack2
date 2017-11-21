@@ -29,6 +29,15 @@
         android:layout_weight="7"
         android:orientation="vertical">
 
+        <ListView
+            android:id="@+id/friendsListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:listSelector="@color/DarkRed">
+
+        </ListView>
+
+
     </LinearLayout>
 
     <LinearLayout
