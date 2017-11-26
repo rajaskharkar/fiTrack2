@@ -83,7 +83,7 @@ public class HomeActivity extends AppCompatActivity  {
     private void fillDrawer(ArrayList<String> drawerItems) {
         addToDrawerItems(drawerItems, "Add Activity");
         addToDrawerItems(drawerItems, "Friends");
-        addToDrawerItems(drawerItems, "FitSesh");
+        addToDrawerItems(drawerItems, "My Matches");
         addToDrawerItems(drawerItems, "FooDiary");
         addToDrawerItems(drawerItems, "The Fridge");
         addToDrawerItems(drawerItems, "LoginPage");
@@ -122,7 +122,7 @@ public class HomeActivity extends AppCompatActivity  {
                 startFriendsActivity();
                 break;
             case 2:
-                startFitSeshActivity();
+                startMyMatchesActivity();
                 break;
             case 3:
                 startFooDiaryActivity();
@@ -157,6 +157,11 @@ public class HomeActivity extends AppCompatActivity  {
         }
     }
 
+    private void startMyMatchesActivity() {
+        Intent myMatchesIntent= new Intent(HomeActivity.this, MyMatches.class);
+        startActivity(myMatchesIntent);
+    }
+
     private void startFridgeActivity() {
         Intent fridgeActivityIntent= new Intent(HomeActivity.this, FridgeActivity.class);
         startActivity(fridgeActivityIntent);
@@ -165,12 +170,6 @@ public class HomeActivity extends AppCompatActivity  {
     public void startFooDiaryActivity() {
         Intent fooDiaryActivityIntent= new Intent(HomeActivity.this, FooDiaryActivity.class);
         startActivity(fooDiaryActivityIntent);
-    }
-
-    public void startFitSeshActivity() {
-        Intent fitSeshActivityIntent= new Intent(HomeActivity.this, FitSeshActivity.class);
-        startActivity(fitSeshActivityIntent);
-
     }
 
     public void startFriendsActivity() {

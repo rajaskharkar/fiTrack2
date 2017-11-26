@@ -24,6 +24,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
@@ -166,6 +167,8 @@ public class AddActivity extends AppCompatActivity{
                         else{
                             score=score-updateScore;
                         }
+                        Activity activity= new Activity(activityFromET, sign, updateScore);
+                        addActivityToLog(activity,currentUser);
                     }
                 }
                 else{
@@ -180,6 +183,7 @@ public class AddActivity extends AppCompatActivity{
                         else{
                             score=score-updateScore;
                         }
+                        addActivityToLog(activity, currentUser);
                     }
                     else{
                         Toast.makeText(getApplicationContext(), "Select or enter an Activity.", Toast.LENGTH_LONG).show();
@@ -216,6 +220,31 @@ public class AddActivity extends AppCompatActivity{
                 }
             }
         });
+
+        viewLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent= new Intent(AddActivity.this, ViewActivityLog.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void addActivityToLog(Activity activity, BackendlessUser currentUser) {
+        //get activity_log from backendless
+        JsonParser parser = new JsonParser();
+        String activityLogString=currentUser.getProperty("activity_log").toString();
+        ArrayList<Activity> listToReturn= JSONConversion.getListFromJSONStringForActivity(activityLogString);
+
+        //add activity to activity log
+        listToReturn.add(activity);
+
+        //uploadactivity log to backendless.. convert list to json.
+        Gson gson= new Gson();
+        JsonElement element = gson.toJsonTree(listToReturn, new TypeToken<ArrayList<Activity>>() {}.getType());
+        JsonArray jsonArray = element.getAsJsonArray();
+        String activityLogStringToUpload= jsonArray.toString();
+        currentUser.setProperty("activity_log", activityLogStringToUpload);
     }
 
     private void setTextStrings(TextView titleTextView, TextView pleaseAddTextView, TextView currentScoreTextView, TextView saveActivityTextView, TextView addActivityTextView, TextView viewTextView, String scoreString) {

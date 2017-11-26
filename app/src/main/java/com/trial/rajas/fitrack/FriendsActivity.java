@@ -31,8 +31,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.simple.JSONArray;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +74,14 @@ public class FriendsActivity extends AppCompatActivity {
                 alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String searchUser = input.getText().toString();
-                        addFriend(currentUserFriendsAL, searchUser);
+                        BackendlessUser currentUser= Backendless.UserService.CurrentUser();
+                        String currentUserName = currentUser.getProperty("username").toString();
+                        if(searchUser.equals(currentUserName)){
+                            Toast.makeText(getApplicationContext(), "Lol did you really just try to add yourself?", Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            addFriend(currentUserFriendsAL, searchUser);
+                        }
 
                     }
                 });
@@ -85,16 +97,87 @@ public class FriendsActivity extends AppCompatActivity {
         friendsLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final int pos2=position;
+                final int selectedFriendPosition=position;
                 startSeshLL.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(pos2==-1){
+                        if(selectedFriendPosition==-1){
                             Toast.makeText(getApplicationContext(), "Select a friend to start a match with!", Toast.LENGTH_SHORT).show();
                         }
                         else{
-                            String friendName=currentUserFriendsAL.get(pos2);
-                            Toast.makeText(getApplicationContext(), "The friend you selected is: "+friendName, Toast.LENGTH_SHORT).show();
+                            final String friendName=currentUserFriendsAL.get(selectedFriendPosition);
+                            final BackendlessUser currentUser= Backendless.UserService.CurrentUser();
+                            final String currentUserName = currentUser.getProperty("username").toString();
+                            //Get matches arrayList
+                            String currentUserMatches=currentUser.getProperty("matches").toString();
+                            final ArrayList<String> currentUserMatchList= JSONConversion.getMatchListFromJSONString(currentUserMatches);
+                            if(currentUserMatchList.contains(friendName)){
+                                Toast.makeText(getApplicationContext(), "You already have an ongoing match with this friend!", Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                HashMap match = new HashMap();
+                                //name
+                                match.put("player1_name",currentUserName);
+                                match.put("player2_name", friendName);
+                                //score
+                                match.put("player1_score", 0);
+                                match.put("player2_score", 0);
+                                //log
+                                JSONObject firstLog= new JSONObject();
+                                JSONArray firstLogJSONArray= new JSONArray();
+                                String firstLogUploadString=firstLogJSONArray.toJSONString();
+                                try {
+                                    firstLog.put("player1_log", " ");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                match.put("player1_log", firstLogUploadString);
+                                match.put("player2_log", firstLogUploadString);
+                                Backendless.Data.of("Matches").save(match, new AsyncCallback<Map>() {
+                                    @Override
+                                    public void handleResponse(Map response) {
+
+                                        String whereClause = "username= '" + friendName + "'";
+                                        DataQueryBuilder queryBuilder = DataQueryBuilder.create();
+                                        queryBuilder.setWhereClause(whereClause);
+
+                                        Backendless.Data.of(BackendlessUser.class).find(queryBuilder, new AsyncCallback<List<BackendlessUser>>() {
+                                            @Override
+                                            public void handleResponse(List<BackendlessUser> response) {
+                                                if (response.isEmpty()) {
+                                                    Toast.makeText(getApplicationContext(), "This person does not have an account on this app! ASK THEM TO JOIN :D", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    currentUserMatchList.add(friendName);
+                                                    BackendlessUser friendOpponent= response.get(0); //get friend
+                                                    String friendMatchesString= friendOpponent.getProperty("matches").toString();
+                                                    ArrayList<String> friendMatchList= JSONConversion.getMatchListFromJSONString(friendMatchesString);
+                                                    friendMatchList.add(currentUserName);
+
+                                                    //upload ArrayLists as JSONArrays to Backendless
+                                                    uploadMatchListToBackendless(currentUserMatchList, currentUser);
+                                                    uploadMatchListToBackendless(friendMatchList, friendOpponent);
+                                                    Toast.makeText(getApplicationContext(), "Match started!", Toast.LENGTH_SHORT).show();
+                                                    Intent fitSeshActivityIntent= new Intent(FriendsActivity.this, FitSeshActivity.class);
+                                                    fitSeshActivityIntent.putExtra("friend", friendName);
+                                                    fitSeshActivityIntent.putExtra("previous_activity", "FriendsActivity");
+                                                    startActivity(fitSeshActivityIntent);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void handleFault(BackendlessFault fault) {
+                                                Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void handleFault(BackendlessFault fault) {
+                                        Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
                         }
                     }
                 });
@@ -105,6 +188,28 @@ public class FriendsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "Select a friend!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void uploadMatchListToBackendless(ArrayList<String> arrayListToUpload, BackendlessUser user) {
+        JsonArray matchesJSONUploadArray = new JsonArray();
+        for (String friend : arrayListToUpload) {
+            JsonObject matchJSON = new JsonObject();
+            matchJSON.addProperty("match", friend);
+            matchesJSONUploadArray.add(matchJSON);
+        }
+        String matchesUploadString = matchesJSONUploadArray.toString();
+        user.setProperty("matches", matchesUploadString);
+        Backendless.UserService.update(user, new AsyncCallback<BackendlessUser>() {
+            @Override
+            public void handleResponse(BackendlessUser response) {
+                Toast.makeText(getApplicationContext(), "Match started!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+                Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -141,7 +246,7 @@ public class FriendsActivity extends AppCompatActivity {
             @Override
             public void handleResponse(List<BackendlessUser> response) {
                 if (response.isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "User not found!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "This person does not have an account on this app! ASK THEM TO JOIN :D", Toast.LENGTH_SHORT).show();
                 } else {
                     BackendlessUser newFriend = response.get(0); //get friend
                     String newFriendName = newFriend.getProperty("username").toString(); //get friend's name
@@ -149,7 +254,7 @@ public class FriendsActivity extends AppCompatActivity {
                     String newFriendFriends = newFriend.getProperty("friends").toString(); //get friend's friends
 
                     //get both User's friend's lists from the JSON String and convert them to arrayLists
-                    ArrayList<String> newFriendFriendsAL=convertFriendsJSONStringToFriendsJSONArrayList(newFriendFriends);
+                    ArrayList<String> newFriendFriendsAL=JSONConversion.getListFromJSONString(newFriendFriends);
                     //adding each other
                     newFriendFriendsAL.add(currentUserName);
                     currentUserFriendsAL.add(newFriendName);
@@ -165,18 +270,6 @@ public class FriendsActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    private ArrayList<String> convertFriendsJSONStringToFriendsJSONArrayList(String newFriendFriends) {
-        JsonParser parser = new JsonParser();
-        ArrayList<String> newFriendFriendsAL = new ArrayList<String>();
-        JsonArray user2JSONArray = parser.parse(newFriendFriends).getAsJsonArray(); //friendsJSONString
-        for (JsonElement user2JsonElement : user2JSONArray) {
-            JsonObject json = user2JsonElement.getAsJsonObject();
-            String user2Friend = json.get("friend").getAsString();
-            newFriendFriendsAL.add(user2Friend);
-        }
-        return newFriendFriendsAL;
     }
 
 

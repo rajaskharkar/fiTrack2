@@ -91,15 +91,8 @@ public class SignUp extends AppCompatActivity {
 
                 String activityJSONString=createAndPopulateJSONArray();
 
-                JSONObject friendsJSON= new JSONObject();
-                JSONArray friendsJSONArray= new JSONArray();
-                String friendsUpload=friendsJSONArray.toJSONString();
-
-                try {
-                    friendsJSON.put("friend", " ");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                JSONArray shellArrayUpload= new JSONArray();
+                String shellStringUpload=shellArrayUpload.toJSONString();
 
                 if(!password.equals(confirmPassword)){
                     Toast.makeText(getApplicationContext(), "Passwords don't match! Please make sure the passwords entered are the same.", Toast.LENGTH_LONG).show();
@@ -112,7 +105,9 @@ public class SignUp extends AppCompatActivity {
                     user.setPassword(password);
                     user.setProperty("score", score);
                     user.setProperty("activity_set", activityJSONString);
-                    user.setProperty("friends", friendsUpload);
+                    user.setProperty("friends", shellStringUpload);
+                    user.setProperty("activity_log", shellStringUpload);
+                    user.setProperty("matches", shellStringUpload);
                     Backendless.UserService.register(user, new AsyncCallback<BackendlessUser>() {
                         @Override
                         public void handleResponse(BackendlessUser response) {

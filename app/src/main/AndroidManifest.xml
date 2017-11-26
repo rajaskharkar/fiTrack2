@@ -42,5 +42,11 @@
         <activity
             android:name=".SignUp">
         </activity>
+        <activity
+            android:name=".ViewActivityLog">
+        </activity>
+        <activity
+            android:name=".MyMatches">
+        </activity>
     </application>
 </manifest>
