@@ -1,11 +1,13 @@
 package com.trial.rajas.fitrack;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,7 +17,10 @@ import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.DataQueryBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +45,8 @@ public class FitSeshActivity extends AppCompatActivity {
         LinearLayout optionsLL=(LinearLayout) findViewById(R.id.optionsLinearLayout);
         LinearLayout playerActivityLL=(LinearLayout) findViewById(R.id.playerActivityLinearLayout);
         LinearLayout allActivityLL=(LinearLayout) findViewById(R.id.allActivityLinearLayout);
+        LinearLayout resetLL=(LinearLayout) findViewById(R.id.resetLinearLayout);
+        LinearLayout endLL=(LinearLayout) findViewById(R.id.endLinearLayout);
 
         TextView titleTV=(TextView) findViewById(R.id.titleFitSeshTextView);
         final TextView versusTV=(TextView) findViewById(R.id.versusTextView);
@@ -74,11 +81,11 @@ public class FitSeshActivity extends AppCompatActivity {
         p2ScoreTV.setTextColor(Color.BLACK);
 
         Backendless.initApp(this, BackendlessCredentials.APP_ID, BackendlessCredentials.SECRET_KEY);
-        BackendlessUser currentUser= Backendless.UserService.CurrentUser();
-        String currentUserName= currentUser.getProperty("username").toString();
+        final BackendlessUser currentUser= Backendless.UserService.CurrentUser();
+        final String currentUserName= currentUser.getProperty("username").toString();
 
-        String whereClause = "(player1_name= '"+currentUserName+"' or player1_name= '"+opponentName+"') and (player2_name= '"+currentUserName+"' or player2_name= '"+opponentName+"')";
-        DataQueryBuilder queryBuilder = DataQueryBuilder.create();
+        final String whereClause = "(player1_name= '"+currentUserName+"' or player1_name= '"+opponentName+"') and (player2_name= '"+currentUserName+"' or player2_name= '"+opponentName+"')";
+        final DataQueryBuilder queryBuilder = DataQueryBuilder.create();
         queryBuilder.setWhereClause(whereClause);
 
         Backendless.Data.of("Matches").find(queryBuilder, new AsyncCallback<List<Map>>() {
@@ -104,6 +111,120 @@ public class FitSeshActivity extends AppCompatActivity {
             }
         });
 
+        resetLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                android.support.v7.app.AlertDialog.Builder alert = new android.support.v7.app.AlertDialog.Builder(FitSeshActivity.this);
+                alert.setTitle("Reset Score");
+                alert.setMessage("Are you sure you want to reset your scores?");
+                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        DataQueryBuilder queryBuilder2 = DataQueryBuilder.create();
+                        queryBuilder2.setWhereClause(whereClause);
+                        Backendless.Data.of("Matches").find(queryBuilder2, new AsyncCallback<List<Map>>() {
+                            @Override
+                            public void handleResponse(List<Map> matchList) {
+                                Map match=matchList.get(0);
+                                match.put("player1_score", 0).toString();
+                                match.put("player2_score", 0).toString();
+                                Integer player1_score=0;
+                                Integer player2_score=0;
+                                p1ScoreTV.setText(player1_score.toString());
+                                p2ScoreTV.setText(player2_score.toString());
+                                Backendless.Persistence.of("Matches").save(match, new AsyncCallback<Map>() {
+                                    @Override
+                                    public void handleResponse(Map response) {
+                                        Toast.makeText(getApplicationContext(), "Match Reset!",Toast.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void handleFault(BackendlessFault fault) {
+                                        Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+                            @Override
+                            public void handleFault(BackendlessFault fault) {
+                                Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                });
+                alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                    }
+                });
+                alert.show();
+            }
+        });
+
+        endLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                android.support.v7.app.AlertDialog.Builder alert = new android.support.v7.app.AlertDialog.Builder(FitSeshActivity.this);
+                alert.setTitle("End Match");
+                alert.setMessage("Are you sure you want to end this match?");
+                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton){
+                        DataQueryBuilder queryBuilder2 = DataQueryBuilder.create();
+                        queryBuilder2.setWhereClause(whereClause);
+                        Backendless.Data.of("Matches").find(queryBuilder2, new AsyncCallback<List<Map>>() {
+                            @Override
+                            public void handleResponse(List<Map> response) {
+                                Map match=response.get(0);
+                                Backendless.Data.of("Matches").remove(match, new AsyncCallback<Long>() {
+                                    @Override
+                                    public void handleResponse(Long response) {
+                                        Toast.makeText(getApplicationContext(), "Match ended!", Toast.LENGTH_LONG).show();
+                                        //remove people from each other's match list
+
+                                        //get current user's match list
+                                        String whereFindUser = "username= '" + opponentName + "'";
+                                        DataQueryBuilder getNameQuery = DataQueryBuilder.create();
+                                        getNameQuery.setWhereClause(whereFindUser);
+                                        Backendless.Data.of(BackendlessUser.class).find(getNameQuery, new AsyncCallback<List<BackendlessUser>>() {
+                                                    @Override
+                                                    public void handleResponse(List<BackendlessUser> response) {
+                                                        BackendlessUser opponent = response.get(0);
+                                                        removeOpponentFromMatchList(currentUser, opponentName);
+                                                        removeOpponentFromMatchList(opponent, currentUserName);
+                                                        finish();
+                                                        Intent goHome= new Intent(FitSeshActivity.this, HomeActivity.class);
+                                                        startActivity(goHome);
+                                                    }
+
+                                                    @Override
+                                                    public void handleFault(BackendlessFault fault) {
+                                                        Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
+                                                    }
+                                                });
+                                                //get friend's match list
+                                                //go to home page
+                                    }
+
+                                    @Override
+                                    public void handleFault(BackendlessFault fault) {
+                                        Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void handleFault(BackendlessFault fault) {
+                                Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                });
+                alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                });
+                alert.show();
+            }
+        });
+
         //What we're looking for: (currentUserName || opponent) && (currentUserName || opponent)
         titleTV.setText("Match");
         resetTV.setText("Reset");
@@ -111,6 +232,32 @@ public class FitSeshActivity extends AppCompatActivity {
         extendTV.setText("Extend");
         allActivityTV.setText("All Activities Log");
 
+    }
+
+    private void removeOpponentFromMatchList(BackendlessUser user, String opponentName) {
+        String userMatches=user.getProperty("matches").toString();
+        ArrayList<String> userMatchString= JSONConversion.getMatchListFromJSONString(userMatches);
+        userMatchString.remove(opponentName);
+        //convert back to JSON String
+        JsonArray matchesJSONUploadArray = new JsonArray();
+        for (String match : userMatchString) {
+            JsonObject matchJSON = new JsonObject();
+            matchJSON.addProperty("match", match);
+            matchesJSONUploadArray.add(matchJSON);
+        }
+        String friendsUploadString = matchesJSONUploadArray.toString();
+        user.setProperty("matches", friendsUploadString);
+        Backendless.UserService.update(user, new AsyncCallback<BackendlessUser>() {
+            @Override
+            public void handleResponse(BackendlessUser response) {
+                Toast.makeText(getApplicationContext(), "User removed!", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+                Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override

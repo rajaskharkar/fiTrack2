@@ -267,7 +267,7 @@ public class FriendsActivity extends AppCompatActivity {
 
             @Override
             public void handleFault(BackendlessFault fault) {
-                Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Boom", Toast.LENGTH_LONG).show();
             }
         });
     }

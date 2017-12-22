@@ -18,6 +18,7 @@ import com.backendless.Backendless;
 import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
+import com.backendless.persistence.DataQueryBuilder;
 import com.backendless.utils.JSONObjectConverter;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -31,6 +32,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class AddActivity extends AppCompatActivity{
 
@@ -169,6 +172,7 @@ public class AddActivity extends AppCompatActivity{
                         }
                         Activity activity= new Activity(activityFromET, sign, updateScore);
                         addActivityToLog(activity,currentUser);
+                        editScoreInMatches(currentUser, updateScore, sign);
                     }
                 }
                 else{
@@ -184,6 +188,7 @@ public class AddActivity extends AppCompatActivity{
                             score=score-updateScore;
                         }
                         addActivityToLog(activity, currentUser);
+                        editScoreInMatches(currentUser, updateScore, sign);
                     }
                     else{
                         Toast.makeText(getApplicationContext(), "Select or enter an Activity.", Toast.LENGTH_LONG).show();
@@ -228,6 +233,65 @@ public class AddActivity extends AppCompatActivity{
                 startActivity(intent);
             }
         });
+    }
+
+    private void editScoreInMatches(BackendlessUser currentUser, final Integer updateScore, final String sign) {
+        String currentUserMatches= currentUser.getProperty("matches").toString();
+        final ArrayList<String> matchesAL=JSONConversion.getMatchListFromJSONString(currentUserMatches);
+        final String currentUserName= currentUser.getProperty("username").toString();
+        //get matches with friends
+        for(String opponent: matchesAL){
+            String whereClause = "(player1_name= '"+currentUserName+"' or player1_name= '"+opponent+"') and (player2_name= '"+currentUserName+"' or player2_name= '"+opponent+"')";
+            DataQueryBuilder queryBuilder = DataQueryBuilder.create();
+            queryBuilder.setWhereClause(whereClause);
+
+            Backendless.Data.of("Matches").find(queryBuilder, new AsyncCallback<List<Map>>() {
+                @Override
+                public void handleResponse(List<Map> matchList) {
+                    if (!matchList.isEmpty()) {
+                        Map match = matchList.get(0);
+                        String player1_name = match.get("player1_name").toString();
+                        String player2_name = match.get("player2_name").toString();
+                        String player1_score = match.get("player1_score").toString();
+                        String player2_score = match.get("player2_score").toString();
+                        if (currentUserName.equals(player1_name)) {
+                            Integer newScore=updateMatchScore(sign, updateScore,player1_score);
+                            match.put("player1_score", newScore);
+                        } else {
+                            Integer newScore=updateMatchScore(sign, updateScore,player2_score);
+                            match.put("player2_score", newScore);
+                        }
+                        Backendless.Persistence.of("Matches").save(match, new AsyncCallback<Map>() {
+                            @Override
+                            public void handleResponse(Map response) {
+                                //Toast.makeText(getApplicationContext(), "Match Saved!",Toast.LENGTH_LONG).show();
+                            }
+
+                            @Override
+                            public void handleFault(BackendlessFault fault) {
+                                Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }
+
+                public void handleFault(BackendlessFault fault) {
+                    Toast.makeText(getApplicationContext(), fault.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });       
+        }
+    }
+
+    private Integer updateMatchScore(String sign, Integer updateScore, String player_score) {
+        Integer score=0;
+        Integer player_scoreInt=Integer.valueOf(player_score);
+        if(sign.equals("+")){
+            score=updateScore+player_scoreInt;
+        }
+        else{
+            score=player_scoreInt-updateScore;
+        }
+        return score;
     }
 
     private void addActivityToLog(Activity activity, BackendlessUser currentUser) {
