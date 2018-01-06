@@ -26,7 +26,6 @@ public class Activity {
 
     public String addToJSON(String task, String sign, Integer score, String present){
         String activityJson= new String();
-
         return activityJson;
     }
 }

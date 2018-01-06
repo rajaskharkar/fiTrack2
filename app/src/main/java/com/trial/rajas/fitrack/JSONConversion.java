@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -21,6 +22,28 @@ public class JSONConversion {
             JsonObject json = user2JsonElement.getAsJsonObject();
             String user2Friend = json.get("friend").getAsString();
             listToReturn.add(user2Friend);
+        }
+        return listToReturn;
+    }
+
+    public static JsonArray getFridgeJsonArrayFromJSONString(String jsonString){
+        JsonParser parser = new JsonParser();
+        ArrayList<Ingredient> listToReturn = new ArrayList<Ingredient>();
+        JsonArray fridgeJsonArray = parser.parse(jsonString).getAsJsonArray(); //friendsJSONString
+        return fridgeJsonArray;
+    }
+
+    public static ArrayList<Ingredient> getFridgeListFromJSONString(String jsonString){
+        JsonParser parser = new JsonParser();
+        ArrayList<Ingredient> listToReturn = new ArrayList<Ingredient>();
+        JsonArray fridgeJsonArray = parser.parse(jsonString).getAsJsonArray(); //friendsJSONString
+        for (JsonElement user2JsonElement : fridgeJsonArray) {
+            JsonObject json = user2JsonElement.getAsJsonObject();
+            String ingredientName = json.get("name").getAsString();
+            Float ingredientQuantity = json.get("quantity").getAsFloat();
+            String ingredientUnit = json.get("unit").getAsString();
+            Ingredient ingredient= new Ingredient(ingredientName, ingredientQuantity, ingredientUnit);
+            listToReturn.add(ingredient);
         }
         return listToReturn;
     }
