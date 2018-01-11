@@ -26,9 +26,40 @@ public class JSONConversion {
         return listToReturn;
     }
 
+    public static JsonArray getDishJsonArray(String jsonString){
+        JsonParser parser = new JsonParser();
+        JsonArray dishJsonArray = parser.parse(jsonString).getAsJsonArray(); //friendsJSONString
+        return dishJsonArray;
+    }
+
+    public static ArrayList<Dish> getDishArrayList(String jsonString){
+        JsonParser parser = new JsonParser();
+        ArrayList<Dish> listToReturn = new ArrayList<Dish>();
+        JsonArray dishJsonArray = parser.parse(jsonString).getAsJsonArray(); //friendsJSONString
+        for (JsonElement dish : dishJsonArray) {
+            JsonObject json = dish.getAsJsonObject();
+            String dishName = json.get("name").getAsString();
+            //Get Ingredients as a JSON Array
+            // JsonArray dishIngredientJsonArray = json.get("ingredients").getAsJsonArray();
+            String ingredientsOfDish=json.get("ingredients").getAsString();
+            JsonArray dishIngredientJsonArray=parser.parse(ingredientsOfDish).getAsJsonArray();
+            ArrayList<Ingredient> ingredientArrayList= new ArrayList<>();
+            for (JsonElement ingredient: dishIngredientJsonArray){
+                JsonObject jsonIngredient = ingredient.getAsJsonObject();
+                String ingredientName = jsonIngredient.get("name").getAsString();
+                Float ingredientQuantity = jsonIngredient.get("quantity").getAsFloat();
+                String ingredientUnit = jsonIngredient.get("unit").getAsString();
+                Ingredient finalIngredient= new Ingredient(ingredientName, ingredientQuantity, ingredientUnit);
+                ingredientArrayList.add(finalIngredient);
+            }
+            Dish finalDish= new Dish(dishName, ingredientArrayList);
+            listToReturn.add(finalDish);
+        }
+        return listToReturn;
+    }
+
     public static JsonArray getFridgeJsonArrayFromJSONString(String jsonString){
         JsonParser parser = new JsonParser();
-        ArrayList<Ingredient> listToReturn = new ArrayList<Ingredient>();
         JsonArray fridgeJsonArray = parser.parse(jsonString).getAsJsonArray(); //friendsJSONString
         return fridgeJsonArray;
     }

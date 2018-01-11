@@ -109,6 +109,7 @@ public class SignUp extends AppCompatActivity {
                     user.setProperty("activity_log", shellStringUpload);
                     user.setProperty("matches", shellStringUpload);
                     user.setProperty("fridge", shellStringUpload);
+                    user.setProperty("dishes", shellStringUpload);
                     Backendless.UserService.register(user, new AsyncCallback<BackendlessUser>() {
                         @Override
                         public void handleResponse(BackendlessUser response) {

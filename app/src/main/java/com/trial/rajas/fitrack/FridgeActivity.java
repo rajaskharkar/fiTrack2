@@ -1,5 +1,6 @@
 package com.trial.rajas.fitrack;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -81,7 +82,22 @@ public class FridgeActivity extends AppCompatActivity{
         addDishLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+                Intent addDishIntent= new Intent(FridgeActivity.this, AddDish.class);
+                startActivity(addDishIntent);
+            }
+        });
+
+        cookLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(FridgeActivity.this, CookDish.class));
+            }
+        });
+
+        viewDishesLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(FridgeActivity.this, ViewDishes.class));
             }
         });
     }

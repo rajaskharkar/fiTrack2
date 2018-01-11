@@ -51,5 +51,17 @@
         <activity
             android:name=".AddIngredient">
         </activity>
+        <activity
+            android:name=".AddDish">
+        </activity>
+        <activity
+            android:name=".CookDish">
+        </activity>
+        <activity
+            android:name=".ViewDishes">
+        </activity>
+        <activity
+            android:name=".ViewThisDish">
+        </activity>
     </application>
 </manifest>
