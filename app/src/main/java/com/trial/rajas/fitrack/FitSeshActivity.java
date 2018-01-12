@@ -47,6 +47,8 @@ public class FitSeshActivity extends AppCompatActivity {
         LinearLayout allActivityLL=(LinearLayout) findViewById(R.id.allActivityLinearLayout);
         LinearLayout resetLL=(LinearLayout) findViewById(R.id.resetLinearLayout);
         LinearLayout endLL=(LinearLayout) findViewById(R.id.endLinearLayout);
+        LinearLayout p1LogLL=(LinearLayout) findViewById(R.id.player1LogLinearLayout);
+        LinearLayout p2LogLL=(LinearLayout) findViewById(R.id.player2LogLinearLayout);
 
         TextView titleTV=(TextView) findViewById(R.id.titleFitSeshTextView);
         final TextView versusTV=(TextView) findViewById(R.id.versusTextView);
@@ -225,6 +227,20 @@ public class FitSeshActivity extends AppCompatActivity {
             }
         });
 
+        p1LogLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                putExtraInIntent("player_1",queryBuilder, opponentName);
+            }
+        });
+
+        p2LogLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                putExtraInIntent("player_2",queryBuilder, opponentName);
+            }
+        });
+
         //What we're looking for: (currentUserName || opponent) && (currentUserName || opponent)
         titleTV.setText("Match");
         resetTV.setText("Reset");
@@ -232,6 +248,31 @@ public class FitSeshActivity extends AppCompatActivity {
         extendTV.setText("Extend");
         allActivityTV.setText("All Activities Log");
 
+    }
+
+    private void putExtraInIntent(final String playerNumber, DataQueryBuilder queryBuilder, String opponentName) {
+        final Intent intent= new Intent(FitSeshActivity.this, ViewActivityLog.class);
+        intent.putExtra("name", "player_log");
+        intent.putExtra("friend", opponentName);
+        Backendless.Data.of("Matches").find(queryBuilder, new AsyncCallback<List<Map>>() {
+            @Override
+            public void handleResponse(List<Map> matchList) {
+                Map match=matchList.get(0);
+                if(playerNumber.equals("player_1")){
+                    intent.putExtra("log",match.get("player1_log").toString());
+                }
+                else{
+                    intent.putExtra("log",match.get("player2_log").toString());
+                }
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+                Toast.makeText(FitSeshActivity.this, fault.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void removeOpponentFromMatchList(BackendlessUser user, String opponentName) {

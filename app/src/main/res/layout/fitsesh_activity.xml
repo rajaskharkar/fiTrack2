@@ -175,24 +175,41 @@
         android:weightSum="2"
         android:gravity="center">
 
-
-        <TextView
-            android:id="@+id/p1ActivityTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <LinearLayout
             android:layout_weight="1"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:textColor="#FFFFFF"/>
-
-        <TextView
-            android:id="@+id/p2ActivityTextView"
+            android:id="@+id/player1LogLinearLayout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:textColor="#FFFFFF"/>
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/p1ActivityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:textColor="#FFFFFF"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:id="@+id/player2LogLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
+
+            <TextView
+                android:id="@+id/p2ActivityTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:textColor="#FFFFFF"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

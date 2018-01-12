@@ -173,6 +173,7 @@ public class AddActivity extends AppCompatActivity{
                         Activity activity= new Activity(activityFromET, sign, updateScore);
                         addActivityToLog(activity,currentUser);
                         editScoreInMatches(currentUser, updateScore, sign);
+                        addToMatchLog(currentUser, activity);
                     }
                 }
                 else{
@@ -189,6 +190,7 @@ public class AddActivity extends AppCompatActivity{
                         }
                         addActivityToLog(activity, currentUser);
                         editScoreInMatches(currentUser, updateScore, sign);
+                        addToMatchLog(currentUser, activity);
                     }
                     else{
                         Toast.makeText(getApplicationContext(), "Select or enter an Activity.", Toast.LENGTH_LONG).show();
@@ -230,7 +232,57 @@ public class AddActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Intent intent= new Intent(AddActivity.this, ViewActivityLog.class);
+                intent.putExtra("name", "default");
                 startActivity(intent);
+            }
+        });
+    }
+
+    private void addToMatchLog(BackendlessUser currentUser, final Activity activity) {
+        final String name=currentUser.getProperty("username").toString();
+        final String whereClause = "player1_name= '"+name+"' or player2_name= '"+name+"'";
+        final DataQueryBuilder queryBuilder = DataQueryBuilder.create();
+        queryBuilder.setWhereClause(whereClause);
+        Backendless.Data.of("Matches").find(queryBuilder, new AsyncCallback<List<Map>>() {
+            @Override
+            public void handleResponse(List<Map> response) {
+                for(Map match: response){
+                    String player1_name= match.get("player1_name").toString();
+                    //String player2_name= match.get("player2_name").toString();
+                    if(player1_name.equals(name)){
+                        addingActivityInMatchLog(match, "player1_log", activity);
+                    }
+                    else{
+                        addingActivityInMatchLog(match, "player2_log", activity);
+                    }
+                }
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+                Toast.makeText(AddActivity.this, "Error while adding to match logs: "+ fault.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void addingActivityInMatchLog(Map match, String player_log, Activity activity) {
+        String player1_log=match.get(player_log).toString();
+        ArrayList<Activity> activitiesAL=JSONConversion.getListFromJSONStringForActivity(player1_log);
+        activitiesAL.add(activity);
+        Gson gson=new Gson();
+        JsonElement element = gson.toJsonTree(activitiesAL, new TypeToken<ArrayList<Activity>>() {}.getType());
+        JsonArray jsonArray = element.getAsJsonArray();
+        String activityLogStringToUpload= jsonArray.toString();
+        match.put(player_log, activityLogStringToUpload);
+        Backendless.Persistence.of("Matches").save(match, new AsyncCallback<Map>() {
+            @Override
+            public void handleResponse(Map response) {
+                //Toast.makeText(AddActivity.this, "Something's being saved", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+                Toast.makeText(AddActivity.this, "Error while saving Match: "+fault.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -264,7 +316,7 @@ public class AddActivity extends AppCompatActivity{
                         Backendless.Persistence.of("Matches").save(match, new AsyncCallback<Map>() {
                             @Override
                             public void handleResponse(Map response) {
-                                //Toast.makeText(getApplicationContext(), "Match Saved!",Toast.LENGTH_LONG).show();
+                                //Toast.makeText(getApplicationContext(), "Activity added!",Toast.LENGTH_SHORT).show();
                             }
 
                             @Override

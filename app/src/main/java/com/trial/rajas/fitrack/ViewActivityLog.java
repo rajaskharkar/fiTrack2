@@ -31,18 +31,44 @@ public class ViewActivityLog extends AppCompatActivity {
         titleTV.setText("Your Activity Log");
         titleLL.setBackgroundColor(Color.RED);
 
+        String s = getIntent().getStringExtra("name");
         Backendless.initApp(this, BackendlessCredentials.APP_ID, BackendlessCredentials.SECRET_KEY);
         BackendlessUser currentUser = Backendless.UserService.CurrentUser();
 
-        String activityLogString=currentUser.getProperty("activity_log").toString();
-        ArrayList<Activity> activityArrayList= JSONConversion.getListFromJSONStringForActivity(activityLogString);
+        if(s.equals("default")){
+            String activityLogString=currentUser.getProperty("activity_log").toString();
+            setAdapterForListView(activityLogString, activityLV);
+        }
+
+        else if(s.equals("player_log")){
+            String playerLog = getIntent().getStringExtra("log");
+            setAdapterForListView(playerLog, activityLV);
+        }
+    }
+
+    private void setAdapterForListView(String playerLog, ListView activityLV) {
+        ArrayList<Activity> activityArrayList= JSONConversion.getListFromJSONStringForActivity(playerLog);
         ViewActivityLogAdapter activityListAdapter = new ViewActivityLogAdapter(this, R.layout.row, activityArrayList);
         activityLV.setAdapter(activityListAdapter);
     }
 
+
     @Override
     public void onBackPressed() {
-        Intent goBack= new Intent(ViewActivityLog.this, AddActivity.class);
-        startActivity(goBack);
+        String s = getIntent().getStringExtra("name");
+        if(s.equals("default")){
+            Intent goBack= new Intent(ViewActivityLog.this, AddActivity.class);
+            startActivity(goBack);
+            finish();
+        }
+
+        else if(s.equals("player_log")){
+            Intent goBack= new Intent(ViewActivityLog.this, FitSeshActivity.class);
+            String friend=getIntent().getStringExtra("friend");
+            goBack.putExtra("friend", friend);
+            goBack.putExtra("previous_activity", "MyMatchesActivity");
+            startActivity(goBack);
+            finish();
+        }
     }
 }
