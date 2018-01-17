@@ -69,7 +69,7 @@
             android:layout_weight="1"
             android:textSize="25dp"
             android:layout_gravity="center"
-            android:gravity="center"/>
+            android:gravity="center" />
 
         <EditText
             android:id="@+id/passwordEditText"
@@ -78,7 +78,8 @@
             android:layout_weight="1"
             android:textSize="25dp"
             android:layout_gravity="center"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:inputType="textPassword"/>
 
     </LinearLayout>
 

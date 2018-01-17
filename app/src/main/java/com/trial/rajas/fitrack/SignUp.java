@@ -15,6 +15,7 @@ import com.backendless.Backendless;
 import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
+import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,6 +94,10 @@ public class SignUp extends AppCompatActivity {
 
                 JSONArray shellArrayUpload= new JSONArray();
                 String shellStringUpload=shellArrayUpload.toJSONString();
+                JsonObject json=new JsonObject();
+                json.addProperty("score", 0);
+                shellArrayUpload.add(json);
+                String scoreShellUpload=shellArrayUpload.toJSONString();
 
                 if(!password.equals(confirmPassword)){
                     Toast.makeText(getApplicationContext(), "Passwords don't match! Please make sure the passwords entered are the same.", Toast.LENGTH_LONG).show();
@@ -110,6 +115,8 @@ public class SignUp extends AppCompatActivity {
                     user.setProperty("matches", shellStringUpload);
                     user.setProperty("fridge", shellStringUpload);
                     user.setProperty("dishes", shellStringUpload);
+                    user.setProperty("past_scores", scoreShellUpload);
+                    user.setProperty("last_updated_date", 0);
                     Backendless.UserService.register(user, new AsyncCallback<BackendlessUser>() {
                         @Override
                         public void handleResponse(BackendlessUser response) {
@@ -128,19 +135,23 @@ public class SignUp extends AppCompatActivity {
     }
 
     private String createAndPopulateJSONArray() {
+        Activity w= new Activity("Go to a buffet","-",100);
         Activity x=new Activity("Go to the Gym","+", 100);
         Activity y=new Activity("Eat a pizza slice","-", 30);
         Activity z=new Activity("Eat vegetables","+", 20);
 
+        JSONObject wJSON= new JSONObject();
         JSONObject xJSON= new JSONObject();
         JSONObject yJSON= new JSONObject();
         JSONObject zJSON= new JSONObject();
 
+        populateBaseJSON(wJSON,w);
         populateBaseJSON(xJSON,x);
         populateBaseJSON(yJSON,y);
         populateBaseJSON(zJSON,z);
 
         JSONArray activityJSONList= new JSONArray();
+        activityJSONList.add(wJSON);
         activityJSONList.add(xJSON);
         activityJSONList.add(yJSON);
         activityJSONList.add(zJSON);

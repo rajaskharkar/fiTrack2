@@ -63,5 +63,8 @@
         <activity
             android:name=".ViewThisDish">
         </activity>
+        <activity
+            android:name=".ActivitySuggestionsActivity">
+        </activity>
     </application>
 </manifest>
