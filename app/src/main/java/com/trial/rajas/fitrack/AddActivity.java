@@ -316,7 +316,7 @@ public class AddActivity extends AppCompatActivity{
                         Backendless.Persistence.of("Matches").save(match, new AsyncCallback<Map>() {
                             @Override
                             public void handleResponse(Map response) {
-                                //Toast.makeText(getApplicationContext(), "Activity added!",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Activity added!",Toast.LENGTH_SHORT).show();
                             }
 
                             @Override

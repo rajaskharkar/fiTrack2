@@ -1,14 +1,10 @@
 package com.trial.rajas.fitrack;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.ListViewAutoScrollHelper;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -23,8 +19,6 @@ import com.backendless.Backendless;
 import com.backendless.BackendlessUser;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
-import com.backendless.persistence.local.UserIdStorageFactory;
-import com.backendless.persistence.local.UserTokenStorageFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -32,8 +26,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -227,9 +219,7 @@ public class HomeActivity extends AppCompatActivity {
         addToDrawerItems(drawerItems, "Add Activity");
         addToDrawerItems(drawerItems, "Friends");
         addToDrawerItems(drawerItems, "My Matches");
-        addToDrawerItems(drawerItems, "FooDiary");
         addToDrawerItems(drawerItems, "The Fridge");
-        addToDrawerItems(drawerItems, "LoginPage");
         addToDrawerItems(drawerItems, "Log out");
     }
 
@@ -269,16 +259,9 @@ public class HomeActivity extends AppCompatActivity {
                 startMyMatchesActivity();
                 break;
             case 3:
-                startFooDiaryActivity();
-                break;
-            case 4:
                 startFridgeActivity();
                 break;
-            case 5:
-                Intent loginPageStart = new Intent(HomeActivity.this, LoginPage.class);
-                startActivity(loginPageStart);
-                break;
-            case 6:
+            case 4:
                 Backendless.UserService.logout(new AsyncCallback<Void>() {
                     @Override
                     public void handleResponse(Void response) {
@@ -296,7 +279,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
 
                     public void onFinish() {
-                        Intent logOutIntent = new Intent(HomeActivity.this, LoginPage.class);
+                        Intent logOutIntent = new Intent(HomeActivity.this, StartUpPage.class);
                         startActivity(logOutIntent);
                     }
                 }.start();

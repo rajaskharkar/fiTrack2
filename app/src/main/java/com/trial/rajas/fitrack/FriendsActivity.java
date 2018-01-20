@@ -301,7 +301,7 @@ public class FriendsActivity extends AppCompatActivity {
     private void setTextStrings(TextView titleFriendsTV, TextView addFriendTV, TextView startSeshTV) {
         titleFriendsTV.setText("Friends");
         addFriendTV.setText("Add Friend");
-        startSeshTV.setText("Start Sesh!");
+        startSeshTV.setText("Start Match!");
     }
 
     private void setBackGroundColors(LinearLayout titleLL, LinearLayout addFriendLL, LinearLayout startSeshLL, Context context) {
