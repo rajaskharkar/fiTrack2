@@ -6,10 +6,11 @@ package com.trial.rajas.fitrack;
 
 public class Ingredient {
 
-    public Ingredient(String name, Float quantity, String unit) {
+    public Ingredient(String name, Float quantity, String unit, Float calorieCount) {
         this.name = name;
         this.quantity = quantity;
         this.unit = unit;
+        this.calorie_count= calorieCount;
     }
 
     public String getName() {
@@ -36,7 +37,16 @@ public class Ingredient {
         this.unit = unit;
     }
 
+    public Float getCalorieCount() {
+        return calorie_count;
+    }
+
+    public void setCalorieCount(Float calorieCount) {
+        this.calorie_count = calorie_count;
+    }
+
     String name;
     Float quantity;
     String unit;
+    Float calorie_count;
 }

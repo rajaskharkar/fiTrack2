@@ -23,6 +23,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 /**
@@ -30,8 +32,6 @@ import java.util.ArrayList;
  */
 
 public class AddDish extends AppCompatActivity {
-
-    public static ArrayList<Ingredient> ingredientAL= new ArrayList<>();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +50,7 @@ public class AddDish extends AppCompatActivity {
         final EditText quantityET=(EditText) findViewById(R.id.quantityIngredientDishET);
         final EditText unitET=(EditText) findViewById(R.id.unitIngredientDishET);
         ListView ingredientLV=(ListView) findViewById(R.id.dishIngredientListView);
+        final ArrayList<Ingredient> ingredientAL= new ArrayList<>();
         addDishLL.setBackgroundColor(Color.RED);
         saveDishLL.setBackgroundColor(Color.RED);
         saveIngredientLL.setBackgroundColor(ContextCompat.getColor(this, R.color.DarkRed));
@@ -89,6 +90,7 @@ public class AddDish extends AppCompatActivity {
                         ingredientJsonObject.addProperty("name", ingredient.name);
                         ingredientJsonObject.addProperty("quantity", ingredient.quantity.toString());
                         ingredientJsonObject.addProperty("unit", ingredient.unit);
+                        ingredientJsonObject.addProperty("calorie_count", Float.parseFloat("0"));
                         ingredientJsonArray.add(ingredientJsonObject);
                     }
                     String ingredientJsonArrayAsString= ingredientJsonArray.toString();
@@ -119,13 +121,26 @@ public class AddDish extends AppCompatActivity {
                 String name=nameET.getText().toString();
                 String quantity=quantityET.getText().toString();
                 String unit=unitET.getText().toString();
+                String fridgeDataString= currentUser.getProperty("fridge").toString();
+                Float quantityFloat=Float.parseFloat(quantity);
+                Float calorieCountFloat= new Float(0);
+                ArrayList<Ingredient> fridgeIngredientAL= JSONConversion.getFridgeListFromJSONString(fridgeDataString);
+                ArrayList<String>  fridgeIngredientNamesAL= new ArrayList<String>();
+                for(Ingredient ingredientInFridge: fridgeIngredientAL){
+                    fridgeIngredientNamesAL.add(ingredientInFridge.name);
+                }
+                if(fridgeIngredientNamesAL.contains(name)){
+                    Integer index= fridgeIngredientNamesAL.indexOf(name);
+                    Ingredient fridgeIngredient= fridgeIngredientAL.get(index);
+                    calorieCountFloat=fridgeIngredient.calorie_count*quantityFloat;
+                }
+                String calorieCount=calorieCountFloat.toString();
                 if(name.equals("") || quantity.equals("") || unit.equals("")){
                     Toast.makeText(context, "Enter all details", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     try{
-                        Float quantityFloat=Float.parseFloat(quantity);
-                        Ingredient ingredient= new Ingredient(name, quantityFloat, unit);
+                        Ingredient ingredient= new Ingredient(name, quantityFloat, unit, calorieCountFloat);
                         ingredientAL.add(ingredient);
                         dishIngredientAdapter.notifyDataSetChanged();
                     }

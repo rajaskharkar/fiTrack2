@@ -53,18 +53,22 @@ public class FridgeListAdapter extends ArrayAdapter<Ingredient>{
         TextView name= (TextView) view.findViewById(R.id.ingredientRowNameTextView);
         TextView quantity= (TextView) view.findViewById(R.id.ingredientRowQuantityTextView);
         TextView unit= (TextView) view.findViewById(R.id.ingredientRowUnitTextView);
+        TextView calorieCount= (TextView) view.findViewById(R.id.ingredientRowCalorieCountTextView);
         ImageView remove=(ImageView) view.findViewById(R.id.removeIngredientRow);
         final Ingredient ingredient=ingredientList.get(position);
         name.setText(ingredient.name);
         quantity.setText(ingredient.quantity.toString());
         unit.setText(ingredient.unit);
+        calorieCount.setText(ingredient.calorie_count.toString()+" cal/unit");
 
         name.setTextSize(24);
         quantity.setTextSize(24);
         unit.setTextSize(24);
+        calorieCount.setTextSize(14);
         name.setTextColor(Color.BLACK);
         quantity.setTextColor(Color.BLACK);
         unit.setTextColor(Color.BLACK);
+        calorieCount.setTextColor(Color.BLACK);
 
         remove.setOnClickListener(new View.OnClickListener() {
             @Override

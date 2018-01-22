@@ -53,25 +53,35 @@ public class DishIngredientAdapter extends ArrayAdapter<Ingredient>{
         TextView name= (TextView) view.findViewById(R.id.ingredientRowNameTextView);
         TextView quantity= (TextView) view.findViewById(R.id.ingredientRowQuantityTextView);
         TextView unit= (TextView) view.findViewById(R.id.ingredientRowUnitTextView);
+        TextView calorieCount= (TextView) view.findViewById(R.id.ingredientRowCalorieCountTextView);
         ImageView remove=(ImageView) view.findViewById(R.id.removeIngredientRow);
         final Ingredient ingredient=ingredientList.get(position);
         name.setText(ingredient.name);
         quantity.setText(ingredient.quantity.toString());
         unit.setText(ingredient.unit);
-
+        Backendless.initApp(getContext(), BackendlessCredentials.APP_ID, BackendlessCredentials.SECRET_KEY);
+        BackendlessUser currentUser=Backendless.UserService.CurrentUser();
+        Boolean checkIngredient=CalorieCounter.isIngredientInFridge(ingredient, currentUser);
+        if(checkIngredient){
+            calorieCount.setText(ingredient.calorie_count.toString());
+        }
+        else{
+            calorieCount.setText("Not in Fridge");
+        }
         name.setTextSize(24);
         quantity.setTextSize(24);
         unit.setTextSize(24);
+        calorieCount.setTextSize(24);
         name.setTextColor(Color.BLACK);
         quantity.setTextColor(Color.BLACK);
         unit.setTextColor(Color.BLACK);
+        calorieCount.setTextColor(Color.BLACK);
 
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ingredientList.remove(position);
                 notifyDataSetChanged();
-                AddDish.ingredientAL.remove(position);
             }
         });
         return view;

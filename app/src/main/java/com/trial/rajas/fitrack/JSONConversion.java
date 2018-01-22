@@ -49,7 +49,8 @@ public class JSONConversion {
                 String ingredientName = jsonIngredient.get("name").getAsString();
                 Float ingredientQuantity = jsonIngredient.get("quantity").getAsFloat();
                 String ingredientUnit = jsonIngredient.get("unit").getAsString();
-                Ingredient finalIngredient= new Ingredient(ingredientName, ingredientQuantity, ingredientUnit);
+                Float ingredientCalories = jsonIngredient.get("calorie_count").getAsFloat();
+                Ingredient finalIngredient= new Ingredient(ingredientName, ingredientQuantity, ingredientUnit, ingredientCalories);
                 ingredientArrayList.add(finalIngredient);
             }
             Dish finalDish= new Dish(dishName, ingredientArrayList);
@@ -73,7 +74,8 @@ public class JSONConversion {
             String ingredientName = json.get("name").getAsString();
             Float ingredientQuantity = json.get("quantity").getAsFloat();
             String ingredientUnit = json.get("unit").getAsString();
-            Ingredient ingredient= new Ingredient(ingredientName, ingredientQuantity, ingredientUnit);
+            Float ingredientCalories = json.get("calorie_count").getAsFloat();
+            Ingredient ingredient= new Ingredient(ingredientName, ingredientQuantity, ingredientUnit, ingredientCalories);
             listToReturn.add(ingredient);
         }
         return listToReturn;

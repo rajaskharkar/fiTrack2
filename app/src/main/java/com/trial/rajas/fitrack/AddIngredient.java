@@ -33,15 +33,18 @@ public class AddIngredient extends AppCompatActivity {
         LinearLayout nameLL=(LinearLayout) findViewById(R.id.ingredientNameLinearLayout);
         LinearLayout quantityLL=(LinearLayout) findViewById(R.id.ingredientQuantityLinearLayout);
         LinearLayout unitLL=(LinearLayout) findViewById(R.id.ingredientUnitLinearLayout);
+        LinearLayout calorieCountLL=(LinearLayout) findViewById(R.id.ingredientCalorieCountLinearLayout);
         LinearLayout addLL=(LinearLayout) findViewById(R.id.addIngredientLinearLayout);
         TextView titleTV=(TextView) findViewById(R.id.addIngredientTitleTextView);
         TextView nameTV=(TextView) findViewById(R.id.ingredientNameTextView);
         TextView quantityTV=(TextView) findViewById(R.id.ingredientQuantityTextView);
-        TextView unitTV=(TextView) findViewById(R.id.ingredientUnitSignUpTextView);
+        TextView unitTV=(TextView) findViewById(R.id.ingredientUnitTextView);
+        TextView calorieCountTV=(TextView) findViewById(R.id.ingredientCalorieCountTextView);
         TextView addTV=(TextView) findViewById(R.id.addIngredientTextView);
         final EditText nameET=(EditText) findViewById(R.id.ingredientNameEditText);
         final EditText quantityET=(EditText) findViewById(R.id.ingredientQuantityEditText);
-        final EditText unitET=(EditText) findViewById(R.id.ingredientUnitSignUpEditText);
+        final EditText unitET=(EditText) findViewById(R.id.ingredientUnitEditText);
+        final EditText calorieCountET=(EditText) findViewById(R.id.ingredientCalorieCountEditText);
 
         titleLL.setBackgroundColor(Color.RED);
         addLL.setBackgroundColor(Color.RED);
@@ -49,11 +52,13 @@ public class AddIngredient extends AppCompatActivity {
         nameTV.setTextColor(Color.BLACK);
         quantityTV.setTextColor(Color.BLACK);
         unitTV.setTextColor(Color.BLACK);
+        calorieCountTV.setTextColor(Color.BLACK);
 
         titleTV.setText("Add Ingredient");
         nameTV.setText("Ingredient: ");
         quantityTV.setText("Quantity: ");
         unitTV.setText("Unit: ");
+        calorieCountTV.setText("Number of calories/unit: ");
         addTV.setText("Add!");
 
         Backendless.initApp(this, BackendlessCredentials.APP_ID, BackendlessCredentials.SECRET_KEY);
@@ -70,7 +75,9 @@ public class AddIngredient extends AppCompatActivity {
                 String quantityString=quantityET.getText().toString();
                 Float quantity= Float.parseFloat(quantityString);
                 String unit=unitET.getText().toString();
-                if(name.equals("") || quantity.equals("") || unit.equals("")){
+                String calorieCountString= calorieCountET.getText().toString();
+                Float calorieCount= Float.parseFloat(calorieCountString);
+                if(name.equals("") || quantityString.equals("") || unit.equals("") || calorieCountString.equals("")){
                     Toast.makeText(getApplicationContext(), "Please fill in all the details",Toast.LENGTH_SHORT);
                 }
                 else{
@@ -78,6 +85,7 @@ public class AddIngredient extends AppCompatActivity {
                     ingredientJSON.addProperty("name",name);
                     ingredientJSON.addProperty("quantity",quantity);
                     ingredientJSON.addProperty("unit",unit);
+                    ingredientJSON.addProperty("calorie_count",calorieCount);
                     ingredientJsonArray.add(ingredientJSON);
                     String ingredientUploadString= ingredientJsonArray.toString();
                     currentUser.setProperty("fridge",ingredientUploadString);

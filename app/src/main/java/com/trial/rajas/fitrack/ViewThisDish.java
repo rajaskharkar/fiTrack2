@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.FloatRange;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -38,11 +39,13 @@ public class ViewThisDish extends AppCompatActivity {
 
         Backendless.initApp(this, BackendlessCredentials.APP_ID, BackendlessCredentials.SECRET_KEY);
         BackendlessUser currentUser=Backendless.UserService.CurrentUser();
+
         String dishDataString=currentUser.getProperty("dishes").toString();
         final ArrayList<Dish> dishArrayList=JSONConversion.getDishArrayList(dishDataString);
         Dish dish= dishArrayList.get(dishPosition);
         titleTV.setText(dish.name);
-        DishIngredientAdapter ingredientAdapter = new DishIngredientAdapter(this, R.layout.view_dishes_row, dish.ingredientArrayList);
+        ArrayList<Ingredient> ingredientsWithCalories= CalorieCounter.getCalorieCount(dish, viewThisDishTV, currentUser);
+        DishIngredientAdapter ingredientAdapter = new DishIngredientAdapter(this, R.layout.fridge_list_row, ingredientsWithCalories);
         dishesLV.setAdapter(ingredientAdapter);
     }
 
