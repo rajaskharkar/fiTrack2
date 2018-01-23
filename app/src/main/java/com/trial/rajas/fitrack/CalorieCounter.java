@@ -20,7 +20,7 @@ public class CalorieCounter {
         String fridgeDataString=currentUser.getProperty("fridge").toString();
         ArrayList<Ingredient> ingredientsInFridge=JSONConversion.getFridgeListFromJSONString(fridgeDataString);
         ArrayList<String> fridgeIngredientsName= new ArrayList<>();
-        HashMap hashmap= CalorieCounter.getDishCalorieCount(ingredientsInFridge, fridgeIngredientsName, dish);
+        HashMap hashmap= CalorieCounter.getDishCalorieCount(dish, currentUser);
         Float totalCalories= Float.parseFloat(hashmap.get("calories").toString());
         Integer checkAllDishes=Integer.parseInt(hashmap.get("flag").toString());
         if(checkAllDishes==1){
@@ -32,7 +32,10 @@ public class CalorieCounter {
         return dish.ingredientArrayList;
     }
 
-    public static HashMap getDishCalorieCount(ArrayList<Ingredient> ingredientsInFridge, ArrayList<String> fridgeIngredientsName, Dish dish){
+    public static HashMap getDishCalorieCount(Dish dish, BackendlessUser currentUser){
+        String fridgeDataString=currentUser.getProperty("fridge").toString();
+        ArrayList<Ingredient> ingredientsInFridge=JSONConversion.getFridgeListFromJSONString(fridgeDataString);
+        ArrayList<String> fridgeIngredientsName= new ArrayList<>();
         Float totalCalories= new Float(0);
         HashMap hashmap= new HashMap();
         Integer checkAllDishes=0;

@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -106,6 +107,8 @@ public class AddActivity extends AppCompatActivity{
         final Spinner activitySpinner= (Spinner) findViewById(R.id.activitySpin);
         final Spinner signSpinner= (Spinner) findViewById(R.id.signSpin);
 
+        final CheckBox actionCB= (CheckBox) findViewById(R.id.actionCheckBox);
+        actionCB.setText("Is this an action based activity?");
 
         String spinArray[]={"+","-"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinArray);
@@ -143,7 +146,8 @@ public class AddActivity extends AppCompatActivity{
                 sign=json.get("sign").getAsString();
             }
             Integer activityScore=json.get("score").getAsInt();
-            Activity newActivity= new Activity(task, sign, activityScore);
+            String action=json.get("action").getAsString();
+            Activity newActivity= new Activity(task, sign, activityScore, action);
             activityList.add(newActivity);
         }
 
@@ -156,6 +160,8 @@ public class AddActivity extends AppCompatActivity{
                 String scoreString2= currentUser.getProperty("score").toString();
                 Integer score=Integer.valueOf(scoreString2);
                 String activityFromET= activityET.getText().toString();
+                Boolean actionBoolean= actionCB.isChecked();
+                String action=actionBoolean.toString();
                 if(!activityFromET.equals("")){
                     String sign= signSpinner.getSelectedItem().toString();
                     String scoreStringFromET= scoreET.getText().toString();
@@ -170,7 +176,7 @@ public class AddActivity extends AppCompatActivity{
                         else{
                             score=score-updateScore;
                         }
-                        Activity activity= new Activity(activityFromET, sign, updateScore);
+                        Activity activity= new Activity(activityFromET, sign, updateScore, action);
                         addActivityToLog(activity,currentUser);
                         editScoreInMatches(currentUser, updateScore, sign);
                         addToMatchLog(currentUser, activity);
@@ -210,13 +216,16 @@ public class AddActivity extends AppCompatActivity{
                 String scoreFromET= scoreET.getText().toString();
                 Integer scoreFromEditText=Integer.valueOf(scoreFromET);
                 String sign= signSpinner.getSelectedItem().toString();
+                Boolean actionBoolean= actionCB.isChecked();
+                String action= actionBoolean.toString();
                 if(!activityFromET.equals("")){
-                    Activity activityToAdd=new Activity(activityFromET, sign, scoreFromEditText);
+                    Activity activityToAdd=new Activity(activityFromET, sign, scoreFromEditText, action);
                     activityList.add(activityToAdd);
                     JsonObject newActivity=new JsonObject();
                     newActivity.addProperty("task", activityFromET);
                     newActivity.addProperty("sign", sign);
                     newActivity.addProperty("score", scoreFromEditText);
+                    newActivity.addProperty("action", action);
                     activityJSONArray.add(newActivity);
                     String activityJSONString= activityJSONArray.toString();
                     currentUser.setProperty("activity_set",activityJSONString);
@@ -389,9 +398,9 @@ public class AddActivity extends AppCompatActivity{
     }
 
     private void fillActivityList(ArrayList<Activity> activityList) {
-        activityList.add(new Activity("Go to the gym", "+", 50));
-        activityList.add(new Activity("Eat a pizza", "-", 25));
-        activityList.add(new Activity("Go for a run", "+", 30));
+        activityList.add(new Activity("Go to the gym", "+", 50, "true"));
+        activityList.add(new Activity("Eat a pizza", "-", 25, "false"));
+        activityList.add(new Activity("Go for a run", "+", 30, "false"));
     }
 
     public void onBackPressed(){

@@ -102,7 +102,8 @@ public class JSONConversion {
             String task= json.getAsJsonObject().get("task").getAsString();
             String sign= json.getAsJsonObject().get("sign").getAsString();
             Integer score= json.getAsJsonObject().get("score").getAsInt();
-            Activity activity=new Activity(task, sign, score);
+            String action=json.getAsJsonObject().get("action").getAsString();
+            Activity activity=new Activity(task, sign, score, action);
             listToReturn.add(activity);
         }
         return listToReturn;

@@ -135,10 +135,10 @@ public class SignUp extends AppCompatActivity {
     }
 
     private String createAndPopulateJSONArray() {
-        Activity w= new Activity("Go to a buffet","-",100);
-        Activity x=new Activity("Go to the Gym","+", 100);
-        Activity y=new Activity("Eat a pizza slice","-", 30);
-        Activity z=new Activity("Eat vegetables","+", 20);
+        Activity w= new Activity("Go to a buffet","-",100, "false");
+        Activity x=new Activity("Go to the Gym","+", 100, "true");
+        Activity y=new Activity("Eat a pizza slice","-", 30, "false");
+        Activity z=new Activity("Eat vegetables","+", 20, "false");
 
         JSONObject wJSON= new JSONObject();
         JSONObject xJSON= new JSONObject();
@@ -163,10 +163,12 @@ public class SignUp extends AppCompatActivity {
         String activityTask=activity.getTask();
         String activitySign=activity.getSign();
         Integer activityScore=activity.getScore();
+        String activityAction=activity.getAction();
         try {
             activityJSON.put("task",activityTask);
             activityJSON.put("sign",activitySign);
             activityJSON.put("score",activityScore);
+            activityJSON.put("action", activityAction);
         } catch (JSONException e) {
             e.printStackTrace();
         }

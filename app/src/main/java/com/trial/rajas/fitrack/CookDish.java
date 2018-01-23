@@ -36,20 +36,24 @@ public class CookDish extends AppCompatActivity {
         final Context context = this;
         setContentView(R.layout.cook_dish);
         LinearLayout titleLL = (LinearLayout) findViewById(R.id.dishNameLinearLayout);
+        LinearLayout perspectiveLL = (LinearLayout) findViewById(R.id.perspectiveLinearLayout);
         LinearLayout randomizeLL = (LinearLayout) findViewById(R.id.randomizeLinearLayout);
         LinearLayout cookThisLL = (LinearLayout) findViewById(R.id.cookThisLinearLayout);
         LinearLayout caloriesLL = (LinearLayout) findViewById(R.id.caloriesDisplayLinearLayout);
         TextView titleTV= (TextView) findViewById(R.id.dishNameTextView);
+        final TextView perspectiveTV= (TextView) findViewById(R.id.perspectiveTextView);
         TextView randomizeTV= (TextView) findViewById(R.id.randomizeTextView);
         TextView cookThisTV= (TextView) findViewById(R.id.cookThisTextView);
         TextView caloriesTV= (TextView) findViewById(R.id.caloriesDisplayTextView);
         ListView ingredientsLV= (ListView) findViewById(R.id.ingredientsNeededListView);
         titleLL.setBackgroundColor(Color.RED);
+        perspectiveLL.setBackgroundColor(ContextCompat.getColor(this, R.color.DarkRed));
         caloriesLL.setBackgroundColor(ContextCompat.getColor(this, R.color.DarkRed));
         randomizeLL.setBackgroundColor(ContextCompat.getColor(this, R.color.DarkRed));
         cookThisLL.setBackgroundColor(Color.RED);
         titleTV.setTextSize(24);
         caloriesTV.setTextSize(24);
+        perspectiveTV.setTextSize(16);
         randomizeTV.setText("Randomize");
         cookThisTV.setText("Cook this!");
 
@@ -98,6 +102,26 @@ public class CookDish extends AppCompatActivity {
             ArrayList<Ingredient> ingredientsWithCalories= CalorieCounter.getCalorieCount(selectedDish, caloriesTV, currentUser);
             FridgeListAdapter fridgeListAdapter = new FridgeListAdapter(this, R.layout.fridge_list_row, ingredientsWithCalories);
             ingredientsLV.setAdapter(fridgeListAdapter);
+
+            String activitySetString=currentUser.getProperty("activity_set").toString();
+            ArrayList<Activity> activitySetAL= JSONConversion.getListFromJSONStringForActivity(activitySetString);
+            final ArrayList<Activity> positiveActivities= new ArrayList<>();
+
+            for(Activity activity: activitySetAL){
+                if(activity.sign.equals("+")){
+                    if(activity.action.equals("true")){
+                        positiveActivities.add(activity);
+                    }
+                }
+            }
+            perspectiveLL.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    findPerspectiveAndDisplay(perspectiveTV, positiveActivities, selectedDish, currentUser);
+                }
+            });
+            findPerspectiveAndDisplay(perspectiveTV, positiveActivities, selectedDish, currentUser);
+
             cookThisLL.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -139,8 +163,23 @@ public class CookDish extends AppCompatActivity {
                 startActivity(getIntent());
             }
         });
+    }
+
+    private void findPerspectiveAndDisplay(TextView perspectiveTV, ArrayList<Activity> positiveActivities, Dish selectedDish, BackendlessUser currentUser) {
+        Activity activity= getRandomActivity(positiveActivities);
+        HashMap caloriesHashmap= CalorieCounter.getDishCalorieCount(selectedDish, currentUser);
+        Float totalCalories=Float.parseFloat(caloriesHashmap.get("calories").toString());
+        Float activityScoreFloat=Float.parseFloat(activity.score.toString());
+        Float activityValue=totalCalories/(4*activityScoreFloat);
+        perspectiveTV.setText("Perspective: To burn this dish, you'll need to do "+activityValue+" hours of '"+activity.task+"'");
+    }
 
 
+    private Activity getRandomActivity(ArrayList<Activity> positiveActivities) {
+        Random random= new Random();
+        Integer index= random.nextInt(positiveActivities.size());
+        Activity randomActivity= positiveActivities.get(index);
+        return randomActivity;
     }
 
     @Override

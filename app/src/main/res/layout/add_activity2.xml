@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:layout_weight="2.5"
+        android:layout_weight="1.5"
         android:weightSum="10">
 
         <Spinner
@@ -99,6 +99,22 @@
             android:gravity="center"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/checkBoxLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_weight="1">
+
+        <CheckBox
+            android:id="@+id/actionCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center">
+        </CheckBox>
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/currentScoreLinearLayout"
         android:layout_width="match_parent"
